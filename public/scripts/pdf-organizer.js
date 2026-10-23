@@ -2,7 +2,8 @@
 function mountPdfOrganizer(root){
   pdfjsLib.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker.min.js";
   root.innerHTML = `<style>
-  .pdf-bar{position:sticky;top:76px;z-index:6;padding:12px 14px}
+  .pdf-bar{position:sticky;top:67px;z-index:6;padding:12px 14px}
+  .pdf-bar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:24px;background:var(--bg)}
   .pdf-bar .row{gap:6px;margin-top:8px;align-items:center}
   .pdf-bar .row>*{flex:0 1 auto}
   .pdf-bar input[type=text]{width:220px;max-width:100%;padding:8px 12px}
@@ -47,6 +48,8 @@ function mountPdfOrganizer(root){
     </div>
     <div id="grid" class="pdf-grid"></div>
   </div>`;
+  const fixTop = () => { const h = document.querySelector("header.site"), b = root.querySelector(".pdf-bar"); if(h && b) b.style.top = h.offsetHeight + "px"; };
+  fixTop(); window.addEventListener("resize", fixTop);
   let doc = null, bytes = null, srcDoc = null, n = 0, name = "document", last = -1, busy = false, obs = null;
   let deleted = new Set(), sel = new Set(), rot = [], cards = [], done = [], queue = [];
   const msg = (t, err) => { $("msg").className = "hint" + (err ? " err" : ""); $("msg").textContent = t; };
@@ -128,7 +131,7 @@ function mountPdfOrganizer(root){
       d.onkeydown = e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(i, e.shiftKey); } };
       $("grid").appendChild(d); cards.push(d); obs.observe(d);
     }
-    $("work").hidden = false; msg("Click pages to select them. Shift+click selects a range."); refresh();
+    $("work").hidden = false; fixTop(); msg("Click pages to select them. Shift+click selects a range."); refresh();
   }
   $("f").onchange = e => load(e.target.files[0]);
   $("all").onclick = () => { kept().forEach(i => sel.add(i)); refresh(); };
@@ -145,7 +148,7 @@ function mountPdfOrganizer(root){
   $("dsel").onclick = () => build([...sel].sort((a, b) => a - b), "_selected");
   $("drem").onclick = () => build(kept(), "_edited");
   $("rng").onkeydown = e => { if(e.key === "Enter") $("rsel").click(); };
-  return () => { if(obs) obs.disconnect(); if(doc) doc.destroy(); };
+  return () => { window.removeEventListener("resize", fixTop); if(obs) obs.disconnect(); if(doc) doc.destroy(); };
 }
 
 mountPdfOrganizer(document.getElementById("tool"));
