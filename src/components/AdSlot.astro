@@ -1,0 +1,10 @@
+---
+import { site } from '../data/site.js';
+const on = site.adsenseClient && site.adsenseSlot;
+---
+{on && (
+  <div class="adwrap" aria-label="Advertisement">
+    <ins class="adsbygoogle" style="display:block" data-ad-client={site.adsenseClient} data-ad-slot={site.adsenseSlot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+)}

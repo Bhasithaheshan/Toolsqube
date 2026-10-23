@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import Icon from '../../components/Icon.astro';
+import { categories, tools } from '../../data/tools.js';
+
+export function getStaticPaths() {
+  return categories.map((c) => ({ params: { category: c.slug }, props: { cat: c } }));
+}
+const { cat } = Astro.props;
+const list = tools.filter((t) => t.category === cat.slug && !t.hidden);
+---
+<Layout title={`Free online ${cat.name.toLowerCase()} tools – ToolsQube`} description={`Free ${cat.name.toLowerCase()} tools that run in your browser.`}>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">All tools</a><span>/</span><span>{cat.name}</span></nav>
+  <div class="pagehead">
+    <span class="ico"><Icon name={cat.slug} /></span>
+    <div><h1>{cat.name} tools</h1><p>Free {cat.name.toLowerCase()} tools that run in your browser.</p></div>
+  </div>
+  <div class="grid">{list.map((t) => <ToolCard tool={t} />)}</div>
+</Layout>

@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import Icon from '../components/Icon.astro';
+import { categories, tools } from '../data/tools.js';
+
+const bars = Array.from({ length: 48 }, (_, i) => {
+  const h = 16 + Math.abs(Math.sin(i * 0.7) * 34 + Math.sin(i * 1.9) * 20 + Math.cos(i * 0.3) * 12);
+  return Math.min(h, 80);
+});
+const A = 20, B = 32;
+---
+<Layout title="ToolsQube – Free online audio and video tools">
+  <section class="hero">
+    <div>
+      <h1>Cut audio and video right in your browser.</h1>
+      <p>Simple tools that run on your own device. No upload, no sign-up, no waiting for a server.</p>
+      <div class="cta">
+        <a class="btn" href="/audio/audio-splitter/"><Icon name="audio" />Split audio</a>
+        <a class="btn ghost" href="/video/video-cutter/"><Icon name="video" />Cut video</a>
+      </div>
+    </div>
+    <figure class="waves" style="margin:0">
+      <svg viewBox="0 0 400 110" role="img" aria-label="Audio waveform with a selected section from 0:48 to 0:55">
+        <rect x={A * 8 + 2} y="4" width={(B - A) * 8} height="86" rx="4" fill="#ffb020" opacity=".14" />
+        {bars.map((h, i) => (
+          <rect class={i >= A && i < B ? 'sel' : 'bar'} style={i >= A && i < B ? `animation-delay:${(i - A) * 70}ms` : ''} x={i * 8 + 4} y={47 - h / 2} width="4" height={h} rx="2" />
+        ))}
+        <line x1={A * 8 + 2} x2={A * 8 + 2} y1="2" y2="92" stroke="#ffb020" stroke-width="2" />
+        <line x1={B * 8 + 2} x2={B * 8 + 2} y1="2" y2="92" stroke="#ffb020" stroke-width="2" />
+        <text class="lbl" x={A * 8 + 2} y="106" text-anchor="middle">0:48</text>
+        <text class="lbl" x={B * 8 + 2} y="106" text-anchor="middle">0:55</text>
+      </svg>
+      <figcaption>Pick a start and an end. Keep just that part.</figcaption>
+    </figure>
+  </section>
+
+  <h2 class="sec" id="tools">All tools</h2>
+  <div class="finder">
+    <label class="search" for="q" style="margin:0"><Icon name="search" /><input id="q" type="search" placeholder="Search tools, e.g. split, cut" autocomplete="off" /></label>
+    <div class="chips" role="group" aria-label="Filter by category">
+      <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+      {categories.map((c) => <button class="chip" type="button" data-f={c.slug} aria-pressed="false">{c.name}</button>)}
+    </div>
+  </div>
+  <div class="grid" id="grid">{tools.filter((t) => !t.hidden).map((t) => <ToolCard tool={t} />)}</div>
+  <p class="empty" id="empty" hidden>No tool matches that search. Try a different word.</p>
+
+  <section class="trust" aria-label="Why ToolsQube">
+    <div><Icon name="lock" /><p style="margin:0"><b>Private by design</b><span>Your files are processed on your device and never leave it.</span></p></div>
+    <div><Icon name="check" /><p style="margin:0"><b>Free, no account</b><span>Open a tool and use it. Nothing to sign up for.</span></p></div>
+    <div><Icon name="zap" /><p style="margin:0"><b>No upload wait</b><span>Big files start working straight away.</span></p></div>
+  </section>
+</Layout>
+
+<script>
+  const q = document.getElementById('q') as HTMLInputElement;
+  const tiles = [...document.querySelectorAll<HTMLElement>('#grid .tile')];
+  const chips = [...document.querySelectorAll<HTMLElement>('.chip')];
+  let cat = 'all';
+  function apply() {
+    const term = q.value.trim().toLowerCase();
+    let shown = 0;
+    tiles.forEach((t) => {
+      const ok = (cat === 'all' || t.dataset.cat === cat) && (!term || t.dataset.text!.includes(term));
+      t.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    document.getElementById('empty')!.hidden = shown > 0;
+  }
+  q.addEventListener('input', apply);
+  chips.forEach((c) => c.addEventListener('click', () => {
+    cat = c.dataset.f!;
+    chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+    apply();
+  }));
+</script>

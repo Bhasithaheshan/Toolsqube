@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { categories } from '../data/tools.js';
+import { site } from '../data/site.js';
+const { title, description = 'Free browser tools for audio and video. Your files never leave your device.' } = Astro.props;
+const path = Astro.url.pathname;
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL('/og-image.png', site.url).href;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b1b2b" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={site.name} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  {site.googleVerification && <meta name="google-site-verification" content={site.googleVerification} />}
+  {site.adsenseClient && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.adsenseClient}`} crossorigin="anonymous"></script>}
+  <slot name="head" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="ToolsQube home">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3l11 6.3v12.4L16 28 5 21.7V9.3z" fill="#0b8a93"/>
+          <path d="M16 3l11 6.3L16 15.6 5 9.3z" fill="#35c9d1"/>
+          <path d="M16 15.6V28l11-6.3V9.3z" fill="#07666d"/>
+          <path d="M20.5 18.6v-3.2M23 17.3v-1.5" stroke="#ffb020" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span style="color:var(--ink)">Tools<span>Qube</span></span>
+      </a>
+      <nav class="main" aria-label="Categories">
+        <a href="/" class={path === '/' ? 'on' : ''}><Icon name="grid" />All tools</a>
+        {categories.map((c) => (
+          <a href={`/${c.slug}/`} class={path.startsWith(`/${c.slug}`) ? 'on' : ''}><Icon name={c.slug} />{c.name}</a>
+        ))}
+      </nav>
+      <span class="pill hide"><Icon name="lock" />Files stay on your device</span>
+    </div>
+  </header>
+  <div class="wrap"><main><slot /></main></div>
+  <footer class="site">
+    <div class="wrap">
+      <div><b style="color:var(--ink)">ToolsQube</b><br />Free tools that run in your browser. Nothing is uploaded.</div>
+      <nav aria-label="Footer">
+        {categories.map((c) => <a href={`/${c.slug}/`}>{c.name} tools</a>)}
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy Policy</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

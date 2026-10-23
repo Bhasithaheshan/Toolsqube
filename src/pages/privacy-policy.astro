@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site.js';
+---
+<Layout title="Privacy Policy – ToolsQube" description="How ToolsQube handles your data, cookies and advertising.">
+  <article class="prose">
+    <h1>Privacy Policy</h1>
+    <p>Last updated: October 2026</p>
+    <p>This policy explains what information {site.name} ({site.url}) handles when you use the website.</p>
+
+    <h2>Your files</h2>
+    <p>The tools on this site process your audio, video and image files inside your own browser. Your files are not uploaded to our servers and we cannot see them.</p>
+
+    <h2>Information we collect</h2>
+    <p>We do not ask you to create an account or give us personal details. Like most websites, our hosting provider and analytics tools may automatically record basic technical data such as your IP address, browser type, device type, pages visited and the time of the visit. We use this to keep the site running, understand which tools are used and fix problems.</p>
+
+    <h2>Cookies</h2>
+    <p>Cookies are small files stored on your device. We and our partners may use cookies to measure traffic and to show advertising. You can control or delete cookies in your browser settings.</p>
+
+    <h2>Advertising</h2>
+    <p>We may show ads served by Google AdSense and other third-party vendors. Third-party vendors, including Google, use cookies to serve ads based on your previous visits to this and other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to this site and other sites on the internet.</p>
+    <p>You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" rel="noopener">Google Ads Settings</a>. You can also opt out of some third-party vendors' use of cookies for personalized advertising at <a href="https://www.aboutads.info" rel="noopener">aboutads.info</a>.</p>
+
+    <h2>Third-party links</h2>
+    <p>This site may link to other websites. We are not responsible for their content or privacy practices.</p>
+
+    <h2>Children</h2>
+    <p>This site is not directed at children under 13, and we do not knowingly collect personal information from children.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>We may update this policy from time to time. The date at the top shows when it was last changed.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this policy, email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+  </article>
+</Layout>

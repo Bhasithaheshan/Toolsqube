@@ -1,0 +1,66 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import Icon from '../../components/Icon.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { categories, tools } from '../../data/tools.js';
+import { site } from '../../data/site.js';
+
+export function getStaticPaths() {
+  return tools.map((t) => ({ params: { category: t.category, slug: t.slug }, props: { tool: t } }));
+}
+const { tool } = Astro.props;
+const cat = categories.find((c) => c.slug === tool.category);
+const others = tools.filter((t) => t.slug !== tool.slug && !t.hidden);
+const sizeLinks = tool.group ? tools.filter((t) => t.group === tool.group && t.slug !== tool.slug) : [];
+const url = new URL(`/${tool.category}/${tool.slug}/`, site.url).href;
+const ld = [
+  { '@context': 'https://schema.org', '@type': 'WebApplication', name: tool.title, url, description: tool.description,
+    applicationCategory: 'MultimediaApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } },
+  { '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: tool.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Layout title={tool.seoTitle} description={tool.description}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(ld)} is:inline></script>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">All tools</a><span>/</span><a href={`/${cat.slug}/`}>{cat.name}</a><span>/</span><span>{tool.title}</span></nav>
+  <div class="pagehead">
+    <span class="ico"><Icon name={tool.category} /></span>
+    <div><h1>{tool.title}</h1><p>{tool.intro}</p></div>
+  </div>
+  <p style="margin:0 0 18px"><span class="pill"><Icon name="lock" />Runs on your device. Nothing is uploaded.</span></p>
+  <div class={`toolbox${tool.wide ? " wide" : ""}`}><div id="tool" data-preset={tool.preset ? JSON.stringify(tool.preset) : undefined}></div></div>
+  {(tool.libs || []).map((l) => <script is:inline src={l}></script>)}
+  <script is:inline src="/scripts/common.js"></script>
+  <script is:inline src={`/scripts/${tool.script}`}></script>
+
+  <AdSlot />
+
+  <section class="seo">
+    <h2>How to use {tool.title}</h2>
+    <ol>{tool.howTo.map((s) => <li>{s}</li>)}</ol>
+
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      {tool.faq.map((f) => (
+        <details><summary>{f.q}</summary><p>{f.a}</p></details>
+      ))}
+    </div>
+
+    {sizeLinks.length > 0 && (
+      <>
+        <h2>{tool.groupTitle}</h2>
+        <p class="links">{sizeLinks.map((t) => <a href={`/${t.category}/${t.slug}/`}>{t.title}</a>)}</p>
+      </>
+    )}
+  </section>
+
+  <AdSlot />
+
+  {others.length > 0 && (
+    <>
+      <h2 class="sec">More tools</h2>
+      <div class="grid">{others.map((t) => <ToolCard tool={t} />)}</div>
+    </>
+  )}
+</Layout>

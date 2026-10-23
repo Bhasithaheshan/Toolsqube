@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site.js';
+---
+<Layout title="Contact ToolsQube" description="Contact ToolsQube with questions, feedback or tool requests.">
+  <article class="prose">
+    <h1>Contact</h1>
+    <p>Questions, bug reports or a tool you would like to see? Send us an email and we will get back to you as soon as we can.</p>
+    <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+    <p>When you report a problem, please tell us which tool you used, your browser (for example Chrome or Edge) and what happened. Please do not email us your files, as we do not need them to help.</p>
+  </article>
+</Layout>

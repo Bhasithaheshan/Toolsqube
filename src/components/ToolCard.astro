@@ -1,0 +1,12 @@
+---
+import Icon from './Icon.astro';
+import { categories } from '../data/tools.js';
+const { tool } = Astro.props;
+const cat = categories.find((c) => c.slug === tool.category);
+---
+<a class="tile" href={`/${tool.category}/${tool.slug}/`} data-cat={tool.category} data-text={`${tool.title} ${tool.description} ${cat?.name}`.toLowerCase()}>
+  <span class="ico"><Icon name={tool.category} /></span>
+  <b>{tool.title}</b>
+  <small>{tool.description}</small>
+  <span class="meta"><span class="tag">{cat?.name}</span><span class="tag">Free</span></span>
+</a>
