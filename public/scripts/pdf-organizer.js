@@ -2,7 +2,7 @@
 function mountPdfOrganizer(root){
   pdfjsLib.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker.min.js";
   root.innerHTML = `<style>
-  .pdf-bar{position:sticky;top:67px;z-index:6;padding:12px 14px}
+  .pdf-bar{position:sticky;top:65px;z-index:6;padding:12px 14px}
   .pdf-bar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:24px;background:var(--bg)}
   .pdf-bar .row{gap:6px;margin-top:8px;align-items:center}
   .pdf-bar .row>*{flex:0 1 auto}
@@ -48,7 +48,7 @@ function mountPdfOrganizer(root){
     </div>
     <div id="grid" class="pdf-grid"></div>
   </div>`;
-  const fixTop = () => { const h = document.querySelector("header.site"), b = root.querySelector(".pdf-bar"); if(h && b) b.style.top = h.offsetHeight + "px"; };
+  const fixTop = () => { const h = document.querySelector("header.site"), b = root.querySelector(".pdf-bar"); if(h && b) b.style.top = (h.offsetHeight - 2) + "px"; };
   fixTop(); window.addEventListener("resize", fixTop);
   let doc = null, bytes = null, srcDoc = null, n = 0, name = "document", last = -1, busy = false, obs = null;
   let deleted = new Set(), sel = new Set(), rot = [], cards = [], done = [], queue = [];

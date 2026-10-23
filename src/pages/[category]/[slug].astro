@@ -10,6 +10,7 @@ export function getStaticPaths() {
   return tools.map((t) => ({ params: { category: t.category, slug: t.slug }, props: { tool: t } }));
 }
 const { tool } = Astro.props;
+const v = Date.now(); // every deploy gets a new number, so browsers always load the newest scripts
 const cat = categories.find((c) => c.slug === tool.category);
 const others = tools.filter((t) => t.slug !== tool.slug && !t.hidden);
 const sizeLinks = tool.group ? tools.filter((t) => t.group === tool.group && t.slug !== tool.slug) : [];
@@ -31,8 +32,8 @@ const ld = [
   <p style="margin:0 0 18px"><span class="pill"><Icon name="lock" />Runs on your device. Nothing is uploaded.</span></p>
   <div class={`toolbox${tool.wide ? " wide" : ""}`}><div id="tool" data-preset={tool.preset ? JSON.stringify(tool.preset) : undefined}></div></div>
   {(tool.libs || []).map((l) => <script is:inline src={l}></script>)}
-  <script is:inline src="/scripts/common.js"></script>
-  <script is:inline src={`/scripts/${tool.script}`}></script>
+  <script is:inline src={`/scripts/common.js?v=${v}`}></script>
+  <script is:inline src={`/scripts/${tool.script}?v=${v}`}></script>
 
   <AdSlot />
 
