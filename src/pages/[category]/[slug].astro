@@ -31,7 +31,7 @@ const ld = [
   </div>
   <p style="margin:0 0 18px"><span class="pill"><Icon name="lock" />Runs on your device. Nothing is uploaded.</span></p>
   <div class={`toolbox${tool.wide ? " wide" : ""}`}><div id="tool" data-preset={tool.preset ? JSON.stringify(tool.preset) : undefined}></div></div>
-  {(tool.libs || []).map((l) => <script is:inline src={l}></script>)}
+  {(tool.libs || []).map((l) => <script is:inline src={l.startsWith('/scripts/') ? `${l}?v=${v}` : l}></script>)}
   <script is:inline src={`/scripts/common.js?v=${v}`}></script>
   <script is:inline src={`/scripts/${tool.script}?v=${v}`}></script>
 
