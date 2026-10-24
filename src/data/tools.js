@@ -12,6 +12,13 @@ const privacyQ = {
   a: 'No. Everything happens inside your browser, on your own device. Your file is never sent to ToolsQube or any server.',
 };
 
+const fxCommon = {
+  category: 'audio',
+  script: 'audio-effects.js',
+  group: 'audio-effects',
+  groupTitle: 'More audio effects',
+};
+
 export const baseTools = [
   {
     slug: 'audio-splitter',
@@ -69,6 +76,66 @@ export const baseTools = [
       { q: 'Can I join files of different formats?', a: 'Yes. You can mix MP3, WAV, M4A and other formats in one list. Everything is converted and joined into a single file.' },
       { q: 'What format is the joined file?', a: 'WAV, which keeps full quality. WAV files are larger than MP3, so very long recordings produce big files.' },
       { q: 'Can I add silence between the files?', a: 'Yes. Enter the number of seconds in the Silence between files box. Leave it at 0 to join them back to back.' },
+    ],
+  },
+  {
+    ...fxCommon,
+    slug: 'audio-speed-changer',
+    preset: { mode: 'speed' },
+    title: 'Audio Speed Changer',
+    description: 'Speed up or slow down audio, with or without changing the pitch. Free, runs in your browser.',
+    seoTitle: 'Change Audio Speed Online – Speed Up or Slow Down Audio | Free',
+    intro: 'Make a recording faster or slower, from 0.25x to 4x. Keep the original pitch for lectures and speech, or let the pitch change like a tape. Nothing is uploaded.',
+    howTo: [
+      'Choose your audio file.',
+      'Enter a speed, like 1.5 for one and a half times faster, or tap a quick button.',
+      'Leave Keep the original pitch ticked for natural sounding speech, then click Change speed and download.',
+    ],
+    faq: [
+      privacyQ,
+      { q: 'Does the voice sound higher when I speed it up?', a: 'Not if Keep the original pitch is ticked. The tool stretches the audio in time so the voice keeps its natural pitch. Untick it to get the classic chipmunk effect.' },
+      { q: 'What speed gives the best quality?', a: 'Speeds between 0.5x and 2x sound the most natural. Very extreme speeds can sound a little robotic.' },
+      { q: 'What format is the result?', a: 'WAV, which keeps full quality. WAV files are larger than MP3.' },
+    ],
+  },
+  {
+    ...fxCommon,
+    slug: 'audio-volume-booster',
+    preset: { mode: 'volume' },
+    title: 'Audio Volume Booster',
+    description: 'Make quiet audio louder, or lower the volume. Free, runs in your browser.',
+    seoTitle: 'Increase Audio Volume Online – Free Audio Volume Booster',
+    intro: 'Make a quiet recording louder, or turn a loud one down. Choose a percentage, or let the tool find the loudest level that stays clean. Your file stays on your device.',
+    howTo: [
+      'Choose your audio file. The tool shows how loud its loudest point is.',
+      'Enter a volume in percent (200 is twice as loud), or click Loudest without distortion.',
+      'Click Change volume, listen to the preview and download.',
+    ],
+    faq: [
+      privacyQ,
+      { q: 'What does Loudest without distortion do?', a: 'It finds the highest volume at which the loudest part of your file just reaches the maximum, so the sound is as loud as possible without clipping.' },
+      { q: 'Why does my audio sound harsh when I boost it a lot?', a: 'Boosting past the maximum cuts off the peaks, which causes distortion. Keep the soft limiter ticked to soften it, or choose a lower percentage.' },
+      { q: 'Can I make audio quieter?', a: 'Yes. Enter a value below 100, for example 50 for half the volume.' },
+    ],
+  },
+  {
+    ...fxCommon,
+    slug: 'audio-fade-in-out',
+    preset: { mode: 'fade' },
+    title: 'Audio Fade In and Out',
+    description: 'Add a smooth fade in and fade out to any audio file. Free, runs in your browser.',
+    seoTitle: 'Audio Fade In and Fade Out Online – Add Fades to Audio | Free',
+    intro: 'Start your audio gently and end it smoothly. Choose how many seconds to fade in and fade out, then download the result. Nothing is uploaded.',
+    howTo: [
+      'Choose your audio file.',
+      'Enter the fade in and fade out times in seconds. Use 0 for no fade on that side.',
+      'Pick a Linear or Smooth curve, click Apply fades and download.',
+    ],
+    faq: [
+      privacyQ,
+      { q: 'What is the difference between Linear and Smooth?', a: 'Linear changes the volume at a steady rate. Smooth eases in and out, which usually sounds more natural for music.' },
+      { q: 'Can I fade only the end?', a: 'Yes. Set the fade in to 0 and enter a fade out time.' },
+      { q: 'What if the fade is longer than the audio?', a: 'The fade is limited to the length of the file, so it never runs past the end.' },
     ],
   },
   {
