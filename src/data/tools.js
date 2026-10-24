@@ -52,6 +52,26 @@ export const baseTools = [
     ],
   },
   {
+    slug: 'audio-joiner',
+    category: 'audio',
+    title: 'Audio Joiner',
+    description: 'Join several audio files into one. Reorder them and download. Free, runs in your browser.',
+    seoTitle: 'Audio Joiner Online – Merge Audio Files into One | Free',
+    intro: 'Combine two or more audio files, like MP3, WAV or M4A, into a single file. Put them in the order you want, add a pause between them if you like, and download. Nothing is uploaded.',
+    script: 'audio-joiner.js',
+    howTo: [
+      'Choose your audio files. You can select several at once and add more later.',
+      'Drag the files, or use the arrows, to set the order. Add a short silence between files if you want one.',
+      'Click Join, listen to the preview and download the combined file.',
+    ],
+    faq: [
+      privacyQ,
+      { q: 'Can I join files of different formats?', a: 'Yes. You can mix MP3, WAV, M4A and other formats in one list. Everything is converted and joined into a single file.' },
+      { q: 'What format is the joined file?', a: 'WAV, which keeps full quality. WAV files are larger than MP3, so very long recordings produce big files.' },
+      { q: 'Can I add silence between the files?', a: 'Yes. Enter the number of seconds in the Silence between files box. Leave it at 0 to join them back to back.' },
+    ],
+  },
+  {
     slug: 'video-cutter',
     category: 'video',
     title: 'Video Cutter',
