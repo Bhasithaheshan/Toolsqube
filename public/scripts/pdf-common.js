@@ -83,5 +83,17 @@ const PL = {
   pvCard: `<div class="card pv-card"><label>Preview</label><canvas id="pvc" width="10" height="10"></canvas>
     <div class="row" style="margin-top:10px;align-items:center"><div><button id="pvp" class="alt" type="button">←</button></div><div style="text-align:center"><span id="pvl" style="font-weight:700"></span></div><div style="text-align:right"><button id="pvn" class="alt" type="button">→</button></div></div>
     <p id="pvnote" class="hint" style="margin:8px 0 0"></p></div>`,
+  corner(cx, cy, w, h, deg){ const r = deg * Math.PI / 180, c = Math.cos(r), n = Math.sin(r); return [cx - (w / 2) * c + (h / 2) * n, cy - (w / 2) * n - (h / 2) * c]; },
+  /* Draw an embedded page upright, scaled to fit (or fill) a box on another page. d = PL.dims(sourcePage). */
+  drawFit(page, emb, d, bx, by, bw, bh, fill){
+    const s = fill ? Math.max(bw / d.Wd, bh / d.Hd) : Math.min(bw / d.Wd, bh / d.Hd), w = d.W * s, h = d.H * s, th = (360 - d.r) % 360, [x, y] = PL.corner(bx + bw / 2, by + bh / 2, w, h, th);
+    page.drawPage(emb, {x, y, width:w, height:h, rotate:PDFLib.degrees(th)}); return s;
+  },
+  /* Crop rectangle in page space from margins f = {l,t,r,b} (fractions of the displayed page). */
+  cropRect(page, f){
+    const mb = page.getMediaBox(), d = PL.dims(page), x0 = f.l * d.Wd, x1 = d.Wd - f.r * d.Wd, y0 = f.b * d.Hd, y1 = d.Hd - f.t * d.Hd, a = PL.toPage(d, x0, y0), b = PL.toPage(d, x1, y1);
+    return {x:mb.x + Math.min(a[0], b[0]), y:mb.y + Math.min(a[1], b[1]), w:Math.abs(b[0] - a[0]), h:Math.abs(b[1] - a[1])};
+  },
+  SIZES: {a4:[595.28, 841.89], a3:[841.89, 1190.55], a5:[419.53, 595.28], letter:[612, 792], legal:[612, 1008]},
   cleanup(){ if(PL.url) URL.revokeObjectURL(PL.url); PL.url = null; },
 };
