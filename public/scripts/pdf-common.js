@@ -46,12 +46,42 @@ const PL = {
     <p id="res" style="font-size:1.1rem;font-weight:700;margin:0 0 12px"></p>
     <canvas id="pv" style="max-width:100%;max-height:420px;border:1px solid var(--line);border-radius:10px;background:#fff;display:block;margin-bottom:12px"></canvas>
     <a id="dl" style="text-decoration:none;display:inline-block;padding:12px 20px;border-radius:12px;background:var(--acc);color:var(--accink);font-weight:700">Download</a></div>`,
-  async finish(bytes, fname, text, previewPage){
+  async finish(bytes, fname, text, previewPage, noPreview){
     const blob = new Blob([bytes], {type:"application/pdf"}); if(PL.url) URL.revokeObjectURL(PL.url); PL.url = URL.createObjectURL(blob);
     $("dl").href = PL.url; $("dl").download = fname; $("dl").textContent = "Download " + fname;
     $("res").textContent = text + " (" + PL.sz(blob.size) + ")"; $("out").hidden = false;
-    try{ await PL.preview(bytes, previewPage || 1, $("pv"), 420); }catch(e){ $("pv").hidden = true; }
+    if(noPreview) $("pv").hidden = true; else try{ await PL.preview(bytes, previewPage || 1, $("pv"), 420); }catch(e){ $("pv").hidden = true; }
     $("dl").click(); $("out").scrollIntoView({behavior:"smooth"});
   },
+  PVCSS: `<style>
+  .pv-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+  .pv-card{position:sticky;top:84px}
+  .pv-card canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px;background:#fff}
+  @media (max-width:900px){.pv-grid{grid-template-columns:1fr}.pv-card{position:static;order:-1}}
+  </style>`,
+  /* Live preview: renders one page and lets the tool draw on top of it. */
+  makePreview(drawOverlay){
+    let pd = null, base = null, baseNo = 0, cur = 1, n = 0, W = 0, H = 0, sc = 1, tok = 0;
+    const cv = () => $("pvc");
+    async function draw(){
+      if(!pd) return; const my = ++tok;
+      if(baseNo !== cur){
+        const page = await pd.getPage(cur), v1 = page.getViewport({scale:1}), s = 720 / v1.width, vp = page.getViewport({scale:s}), b = document.createElement("canvas");
+        b.width = vp.width; b.height = vp.height; await page.render({canvasContext:b.getContext("2d"), viewport:vp}).promise;
+        if(my !== tok) return; base = b; baseNo = cur; W = v1.width; H = v1.height; sc = s;
+      }
+      const c = cv(), g = c.getContext("2d"); c.width = base.width; c.height = base.height; g.drawImage(base, 0, 0);
+      const note = drawOverlay(g, {page:cur, n, W, H, sc}); $("pvnote").textContent = note || ""; $("pvl").textContent = "Page " + cur + " of " + n;
+      $("pvp").disabled = cur <= 1; $("pvn").disabled = cur >= n;
+    }
+    return {
+      async open(bytes){ if(pd) pd.destroy(); pd = await pdfjsLib.getDocument({data:bytes.slice()}).promise; n = pd.numPages; cur = 1; baseNo = 0; await draw(); },
+      go(p){ cur = Math.max(1, Math.min(n, p)); draw(); }, step(d){ this.go(cur + d); }, refresh(){ draw(); }, page(){ return cur; },
+      destroy(){ if(pd) pd.destroy(); pd = null; },
+    };
+  },
+  pvCard: `<div class="card pv-card"><label>Preview</label><canvas id="pvc" width="10" height="10"></canvas>
+    <div class="row" style="margin-top:10px;align-items:center"><div><button id="pvp" class="alt" type="button">←</button></div><div style="text-align:center"><span id="pvl" style="font-weight:700"></span></div><div style="text-align:right"><button id="pvn" class="alt" type="button">→</button></div></div>
+    <p id="pvnote" class="hint" style="margin:8px 0 0"></p></div>`,
   cleanup(){ if(PL.url) URL.revokeObjectURL(PL.url); PL.url = null; },
 };
