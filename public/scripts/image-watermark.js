@@ -21,7 +21,7 @@ function mountImageWatermark(root){
   </style>
   <div class="card"><label for="f">1. Choose an image</label><input id="f" type="file" accept="image/*"><p id="info" class="hint">No image chosen.</p></div>
   <div id="ed" hidden>
-    <div class="card"><label>2. Add watermarks</label>
+    <div class="card"><label>2. Add and style your text</label>
       <div class="row"><div><button id="addT" type="button">+ Text</button></div><div><button id="addL" type="button" class="alt">+ Logo or image</button><input id="lf" type="file" accept="image/*" hidden></div><div><button id="undo" type="button" class="alt">↶ Undo</button></div></div>
       <div id="chips" class="wm-chips"></div><p id="none" class="hint">No watermark yet. Add some text or a logo. You can add as many as you like.</p>
       <div id="ctl" hidden><div class="wm-g">
@@ -42,13 +42,15 @@ function mountImageWatermark(root){
     <div class="wm-vp"><canvas id="cv" tabindex="0" aria-label="Image preview"></canvas></div>
     <p class="hint" style="margin:0 0 10px">Drag a watermark to move it. Drag a corner to resize, and the round handle on top to rotate. Arrow keys nudge, Delete removes it.</p>
     <div class="card"><div class="row"><div><label for="of" style="font-weight:600">Save as</label><select id="of"><option value="png">PNG</option><option value="jpg">JPG</option><option value="webp">WebP</option></select></div><div style="align-self:end"><button id="go" type="button">Save the image</button></div></div></div></div>${IL.resultCard}`;
+  let pmode = ""; try{ pmode = (JSON.parse(root.dataset.preset || "null") || {}).mode || ""; }catch(e){}
   let src = null, small = null, name = "image", layers = [], sel = null, uid = 0, hist = ["[]"], mode = null, k = 1; const srcs = {}, stamps = {};
   const cv = $("cv"), g = cv.getContext("2d"), clamp = (v, a, b) => Math.max(a, Math.min(b, v)), layer = () => layers.find(l => l.id === sel) || null;
   const imgSrc = l => { const s = srcs[l.id]; return s ? (l.white ? s.clear : s.orig) : null; };
   function stampOf(l, kk, W){
-    const key = [l.type, l.text, l.font, l.bold, l.italic, l.color, l.outline, l.oc, l.shadow, l.size, l.wf, l.white, kk.toFixed(4)].join("|"); if(stamps[l.id] && stamps[l.id].key === key) return stamps[l.id].st; let st;
+    const key = [l.type, l.text, l.font, l.bold, l.italic, l.color, l.outline, l.oc, l.shadow, l.size, l.wf, l.white, l.fit, kk.toFixed(4)].join("|"); if(stamps[l.id] && stamps[l.id].key === key) return stamps[l.id].st; let st;
     if(l.type === "text"){
       let p = l.size / 100 * W * kk, scl = 1; const fnt = q => (l.italic ? "italic " : "") + (l.bold ? "bold " : "") + q + "px " + IW_FONTS[l.font], m = document.createElement("canvas").getContext("2d"); m.font = fnt(p); let tw = m.measureText(l.text || " ").width;
+      if(l.fit && tw > .94 * W * kk){ p *= .94 * W * kk / tw; m.font = fnt(p); tw = m.measureText(l.text || " ").width; }
       if(tw + p * .6 > 7000){ scl = 7000 / (tw + p * .6); p *= scl; m.font = fnt(p); tw = m.measureText(l.text || " ").width; }
       const ow = l.outline ? Math.max(1, p * .05) : 0, sh = l.shadow ? p * .08 : 0, pad = Math.ceil(p * .12 + ow + sh * 2), asc = p * .85, desc = p * .3, c = document.createElement("canvas"); c.width = Math.max(2, Math.ceil(tw + 2 * pad)); c.height = Math.max(2, Math.ceil(asc + desc + 2 * pad));
       const x = c.getContext("2d"); x.font = fnt(p); x.textBaseline = "alphabetic"; x.lineJoin = "round"; if(l.shadow){ x.shadowColor = "rgba(0,0,0,.55)"; x.shadowBlur = sh * 2; x.shadowOffsetX = sh * .6; x.shadowOffsetY = sh * .6; }
@@ -107,13 +109,16 @@ function mountImageWatermark(root){
     if(e.key === "ArrowLeft") l.cx = clamp(l.cx - st, 0, 1); else if(e.key === "ArrowRight") l.cx = clamp(l.cx + st, 0, 1); else if(e.key === "ArrowUp") l.cy = clamp(l.cy - st, 0, 1); else if(e.key === "ArrowDown") l.cy = clamp(l.cy + st, 0, 1); else if(e.key === "Delete" || e.key === "Backspace"){ $("del").click(); e.preventDefault(); return; } else return; e.preventDefault(); draw(); };
   $("f").onchange = async e => {
     const file = e.target.files[0]; $("ed").hidden = true; $("out").hidden = true; if(!file) return; name = IL.base(file.name); $("info").className = "hint"; $("info").textContent = "Loading...";
-    try{ src = await IL.load(file); const s = Math.min(1, 900 / src.width); small = s < 1 ? IL.resize(src, src.width * s, src.height * s) : src; k = small.width / src.width; cv.width = small.width; cv.height = small.height; layers = []; sel = null; hist = ["[]"]; $("info").textContent = file.name + " (" + src.width + " x " + src.height + " px)"; $("ed").hidden = false; chips(); draw(); }
+    try{ src = await IL.load(file); const s = Math.min(1, 900 / src.width); small = s < 1 ? IL.resize(src, src.width * s, src.height * s) : src; k = small.width / src.width; cv.width = small.width; cv.height = small.height; layers = []; sel = null; hist = ["[]"]; $("info").textContent = file.name + " (" + src.width + " x " + src.height + " px)"; $("ed").hidden = false; chips(); draw();
+      const mk = (text, cy, extra) => ({...base0(), type:"text", text, cy, font:"display", bold:false, italic:false, color:"#ffffff", outline:true, oc:"#000000", shadow:false, size:11, opacity:100, fit:true, ...extra});
+      if(pmode === "meme"){ layers.push(mk("TOP TEXT", .1), mk("BOTTOM TEXT", .9)); sel = layers[0].id; snap(); chips(); sync(); draw(); }
+      else if(pmode === "text"){ layers.push(mk("Your text", .5, {font:"sans", bold:true, outline:false, shadow:true, size:9, fit:false})); sel = layers[0].id; snap(); chips(); sync(); draw(); } }
     catch(err){ $("info").className = "hint err"; $("info").textContent = "Could not read this image. Try JPG, PNG or WebP."; }
   };
   $("go").onclick = async () => {
     const use = layers.filter(l => l.type === "image" || l.text.trim()); if(!use.length) return; const fmt = $("of").value, out = document.createElement("canvas"); out.width = src.width; out.height = src.height; const o = out.getContext("2d");
     if(fmt === "jpg"){ o.fillStyle = "#fff"; o.fillRect(0, 0, out.width, out.height); } o.drawImage(src, 0, 0); const keep = sel; sel = null; paint(o, out, 1, false); sel = keep;
-    const blob = await IL.blob(out, IL.typeOf(fmt), .93); IL.show(blob, name + "_watermarked." + fmt, "Saved: " + out.width + " x " + out.height + " px (" + PL.sz(blob.size) + ")", "");
+    const blob = await IL.blob(out, IL.typeOf(fmt), .93); IL.show(blob, name + (pmode === "meme" ? "_meme." : pmode === "text" ? "_text." : "_watermarked.") + fmt, "Saved: " + out.width + " x " + out.height + " px (" + PL.sz(blob.size) + ")", "");
   };
   return IL.cleanup;
 }
